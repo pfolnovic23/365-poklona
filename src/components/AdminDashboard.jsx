@@ -96,6 +96,13 @@ function AdminDashboard() {
     }
   };
 
+  const formatDateTime = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
+
   const resetForm = () => {
     setFormData({
       day: '',
@@ -138,12 +145,12 @@ function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen flex items-start justify-center p-6 bg-[#f5f4dc]">
-      <div className="w-full max-w-6xl relative mt-6">
-        {/* square offset shadow */}
-        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
+    <div className="min-h-screen flex items-start justify-center p-4 sm:p-6 bg-[#f5f4dc]">
+      <div className="w-full max-w-4xl relative mt-4 sm:mt-6 mx-auto">
+        {/* square offset shadow - disabled on small screens to avoid overflow */}
+        <div className="absolute inset-0 md:translate-x-4 md:translate-y-4 bg-black" aria-hidden />
 
-        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6">
+        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-4 sm:p-6">
           <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
             <div className="flex items-center gap-4">
               <Settings size={28} className="text-[#111827]" />
@@ -215,14 +222,16 @@ function AdminDashboard() {
             <h2 className="text-lg font-semibold text-[#111827] mb-4">Svi Pokloni ({presents.length})</h2>
             <div className="flex flex-col gap-4">
               {presents.map(present => (
-                <div key={present.id} className="p-4 border-2 border-black bg-[#f6f4ee] flex items-center justify-between">
-                  <div className="flex items-center gap-3">
+                <div key={present.id} className="p-3 sm:p-4 border-2 border-black bg-[#f6f4ee] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
                     <span className="font-semibold text-[#111827]">Dan {present.day}</span>
                     <span className="text-sm text-[#111827] bg-[#fff] px-2 py-1 border-2 border-black">{present.type}</span>
                     <span className="text-sm text-[#666]">{present.unlockDate}</span>
-                    {present.opened && <span className="text-sm text-[#667eea]">Otvoreno</span>}
+                    {present.opened && (
+                      <span className="text-sm text-[#667eea] mt-1 sm:mt-0">Otvoreno: {present.openedAt ? formatDateTime(present.openedAt) : ''}</span>
+                    )}
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap mt-2 sm:mt-0">
                     <button onClick={() => { handleEdit(present); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="p-2 bg-[#111827] text-white border-2 border-black"><Edit size={14} /></button>
                     <button onClick={() => handleDelete(present.id)} className="p-2 border-2 border-black bg-[#f6f4ee] text-[#111827]"><Trash2 size={14} /></button>
                     {present.opened && (
