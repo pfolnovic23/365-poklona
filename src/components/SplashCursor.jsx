@@ -22,7 +22,18 @@ function SplashCursor({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+    
+    // Detect low-end devices (mobile or very few CPU cores) and reduce quality
+    const hwConcurrency = navigator.hardwareConcurrency || 4;
+    const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    const veryLowEnd = hwConcurrency <= 1 || (isMobile && hwConcurrency <= 2);
+    const lowEnd = isMobile || hwConcurrency <= 2;
 
+    if (veryLowEnd) {
+      // Disable heavy canvas-based cursor on very low-end devices
+      canvas.style.display = 'none';
+      return;
+    }
     function pointerPrototype() {
       this.id = -1;
       this.texcoordX = 0;
@@ -53,7 +64,17 @@ function SplashCursor({
       BACK_COLOR,
       TRANSPARENT
     };
-
+    
+    // If device is low-end, lower a bunch of settings to improve FPS
+    if (lowEnd) {
+      config.SIM_RESOLUTION = Math.min(config.SIM_RESOLUTION, 32);
+      config.DYE_RESOLUTION = Math.min(config.DYE_RESOLUTION, 256);
+      config.CAPTURE_RESOLUTION = Math.min(config.CAPTURE_RESOLUTION, 128);
+      config.PRESSURE_ITERATIONS = Math.min(config.PRESSURE_ITERATIONS, 6);
+      config.SPLAT_FORCE = Math.min(config.SPLAT_FORCE, 2000);
+      config.SHADING = false;
+      config.COLOR_UPDATE_SPEED = Math.max(1, config.COLOR_UPDATE_SPEED / 2);
+    }
     let pointers = [new pointerPrototype()];
 
     const { gl, ext } = getWebGLContext(canvas);

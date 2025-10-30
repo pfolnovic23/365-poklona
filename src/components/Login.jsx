@@ -28,10 +28,9 @@ function Login() {
 
       {/* Single centered square card only (no top banner) */}
       <div className="w-full max-w-md relative">
-        {/* sharp-edged offset shadow */}
-        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
+        {/* use box-shadow instead of an absolute element so layout centering stays correct */}
 
-        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-8 text-center">
+        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-8 text-center" style={{ boxShadow: '16px 16px 0 0 #000' }}>
           <div className="mb-6">
             <Gift size={48} className="text-primary mx-auto" />
           </div>
