@@ -5,6 +5,7 @@ import { auth, db } from './firebase';
 import Login from './components/Login';
 import UserView from './components/UserView';
 import AdminDashboard from './components/AdminDashboard';
+import SplashCursor from './components/SplashCursor';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -37,7 +38,10 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-white text-2xl">Učitavanje...</div>
+      <>
+        <div className="min-h-screen flex items-center justify-center text-white text-2xl">Učitavanje...</div>
+        <SplashCursor />
+      </>
     );
   }
 

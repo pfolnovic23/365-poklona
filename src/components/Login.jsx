@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import { Gift } from 'lucide-react';
+import SplashCursor from './SplashCursor';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -56,6 +57,7 @@ function Login() {
           </button>
         </form>
       </div>
+      <SplashCursor />
     </div>
   );
 }

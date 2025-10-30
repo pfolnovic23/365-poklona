@@ -3,6 +3,7 @@ import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import PresentCard from './PresentCard';
+import SplashCursor from './SplashCursor';
 
 function UserView() {
   const [presents, setPresents] = useState([]);
@@ -103,6 +104,7 @@ function UserView() {
           </div>
         </div>
       )}
+      <SplashCursor />
     </div>
   );
 }
