@@ -37,9 +37,7 @@ function App() {
 
   if (loading) {
     return (
-      <div style={styles.loading}>
-        <h2>Učitavanje...</h2>
-      </div>
+      <div className="min-h-screen flex items-center justify-center text-white text-2xl">Učitavanje...</div>
     );
   }
 
@@ -53,16 +51,5 @@ function App() {
 
   return <UserView />;
 }
-
-const styles = {
-  loading: {
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    minHeight: '100vh',
-    color: 'white',
-    fontSize: '24px',
-  },
-};
 
 export default App;

@@ -31,7 +31,7 @@ function UserView() {
 
   const handleOpenPresent = async (present) => {
     setSelectedPresent(present);
-    
+
     if (!present.opened) {
       try {
         const presentRef = doc(db, 'presents', present.id);
@@ -57,19 +57,17 @@ function UserView() {
   };
 
   if (loading) {
-    return <div style={styles.loading}>Učitavanje...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-white text-xl">Učitavanje...</div>;
   }
 
   return (
-    <div style={styles.container}>
-      <header style={styles.header}>
-        <h1 style={styles.title}>🎁 Tvoji Pokloni</h1>
-        <button onClick={handleLogout} style={styles.logoutBtn}>
-          Odjavi se
-        </button>
+    <div className="min-h-screen p-6">
+      <header className="flex items-center justify-between mb-10">
+        <h1 className="text-4xl font-bold text-primary">Tvoji Pokloni</h1>
+        <button onClick={handleLogout} className="py-2 px-4 rounded-lg border border-white/10 glass text-white">Odjavi se</button>
       </header>
 
-      <div style={styles.grid}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
         {presents.map(present => (
           <PresentCard
             key={present.id}
@@ -81,32 +79,23 @@ function UserView() {
       </div>
 
       {selectedPresent && (
-        <div style={styles.modal} onClick={() => setSelectedPresent(null)}>
-          <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button 
-              style={styles.closeBtn}
-              onClick={() => setSelectedPresent(null)}
-            >
-              ✕
-            </button>
-            <h2 style={styles.modalTitle}>Dan {selectedPresent.day}</h2>
-            
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setSelectedPresent(null)}>
+          <div className="bg-white/6 border border-white/10 rounded-2xl p-8 max-w-2xl w-full mx-4 relative" onClick={(e) => e.stopPropagation()}>
+            <button className="absolute top-4 right-4 text-white text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
+            <h2 className="text-2xl font-bold text-primary mb-4">Dan {selectedPresent.day}</h2>
+
             {selectedPresent.type === 'text' && (
-              <p style={styles.text}>{selectedPresent.content}</p>
+              <p className="text-white leading-relaxed">{selectedPresent.content}</p>
             )}
-            
+
             {selectedPresent.type === 'image' && (
-              <img 
-                src={selectedPresent.content} 
-                alt="Present" 
-                style={styles.image}
-              />
+              <img src={selectedPresent.content} alt="Present" className="w-full rounded-lg mt-4" />
             )}
-            
+
             {selectedPresent.type === 'song' && (
               <div>
-                <p style={styles.songTitle}>{selectedPresent.title}</p>
-                <audio controls style={styles.audio}>
+                <p className="text-primary font-semibold mb-2">{selectedPresent.title}</p>
+                <audio controls className="w-full">
                   <source src={selectedPresent.content} type="audio/mpeg" />
                 </audio>
               </div>
@@ -118,110 +107,4 @@ function UserView() {
   );
 }
 
-  const styles = {
-    container: {
-      minHeight: '100vh',
-      padding: '20px',
-    },
-    header: {
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: '40px',
-      flexWrap: 'wrap',
-      gap: '15px',
-    },
-    title: {
-      color: 'var(--accent)',
-      fontSize: '36px',
-      fontWeight: '700',
-    },
-    logoutBtn: {
-      padding: '12px 24px',
-      background: 'var(--card-bg)',
-      border: '1px solid var(--card-border)',
-      borderRadius: '12px',
-      color: 'var(--text-primary)',
-      cursor: 'pointer',
-      fontWeight: '600',
-      transition: 'all 0.3s ease',
-    },
-    grid: {
-      display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))',
-      gap: '24px',
-      maxWidth: '1400px',
-      margin: '0 auto',
-    },
-    loading: {
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      minHeight: '100vh',
-      color: 'var(--text-primary)',
-      fontSize: '24px',
-    },
-    modal: {
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: 'rgba(15, 15, 35, 0.9)',
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: '20px',
-      zIndex: 1000,
-      backdropFilter: 'blur(10px)',
-    },
-    modalContent: {
-      background: 'var(--card-bg)',
-      border: '1px solid var(--card-border)',
-      borderRadius: '20px',
-      padding: '40px',
-      maxWidth: '600px',
-      width: '100%',
-      maxHeight: '80vh',
-      overflow: 'auto',
-      position: 'relative',
-      boxShadow: '0 20px 60px var(--shadow)',
-    },
-    closeBtn: {
-      position: 'absolute',
-      top: '20px',
-      right: '20px',
-      background: 'none',
-      border: 'none',
-      fontSize: '24px',
-      cursor: 'pointer',
-      color: 'var(--text-secondary)',
-      transition: 'color 0.3s ease',
-    },
-    modalTitle: {
-      color: 'var(--accent)',
-      marginBottom: '20px',
-      fontSize: '32px',
-      fontWeight: '700',
-    },
-    text: {
-      fontSize: '18px',
-      lineHeight: '1.7',
-      color: 'var(--text-primary)',
-    },
-    image: {
-      width: '100%',
-      borderRadius: '12px',
-      marginTop: '20px',
-    },
-    songTitle: {
-      fontSize: '22px',
-      marginBottom: '15px',
-      color: 'var(--accent)',
-      fontWeight: '600',
-    },
-    audio: {
-      width: '100%',
-      marginTop: '20px',
-    },
-  };export default UserView;
+export default UserView;

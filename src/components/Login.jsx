@@ -23,21 +23,21 @@ function Login() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <div style={styles.icon}>
-          <Gift size={48} color="var(--accent)" />
+    <div className="min-h-screen flex items-center justify-center p-6">
+      <div className="max-w-md w-full glass border rounded-2xl p-10 shadow-2xl text-center">
+        <div className="mb-6">
+          <Gift size={48} className="text-primary mx-auto" />
         </div>
-        <h1 style={styles.title}>365 Poklona</h1>
-        <p style={styles.subtitle}>Prijavi se da otvoriš svoje poklone</p>
-        
-        <form onSubmit={handleLogin} style={styles.form}>
+        <h1 className="text-3xl font-bold text-primary mb-2">365 Poklona</h1>
+        <p className="text-sm text-gray-300 mb-6">Prijavi se da otvoriš svoje poklone</p>
+
+        <form onSubmit={handleLogin} className="flex flex-col gap-4">
           <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            style={styles.input}
+            className="px-4 py-3 rounded-xl border bg-white/5 border-white/10 text-white outline-none"
             required
           />
           <input
@@ -45,13 +45,13 @@ function Login() {
             placeholder="Lozinka"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            style={styles.input}
+            className="px-4 py-3 rounded-xl border bg-white/5 border-white/10 text-white outline-none"
             required
           />
-          
-          {error && <p style={styles.error}>{error}</p>}
-          
-          <button type="submit" style={styles.button} disabled={loading}>
+
+          {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+
+          <button type="submit" disabled={loading} className="mt-2 py-3 rounded-xl bg-primary text-white font-semibold disabled:opacity-60">
             {loading ? 'Prijava...' : 'Prijavi se'}
           </button>
         </form>
@@ -59,71 +59,5 @@ function Login() {
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: '100vh',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '20px',
-  },
-  card: {
-    background: 'var(--card-bg)',
-    border: '1px solid var(--card-border)',
-    borderRadius: '20px',
-    padding: '40px',
-    maxWidth: '400px',
-    width: '100%',
-    boxShadow: '0 20px 60px var(--shadow)',
-    backdropFilter: 'blur(10px)',
-    textAlign: 'center',
-  },
-  icon: {
-    marginBottom: '20px',
-  },
-  title: {
-    fontSize: '32px',
-    marginBottom: '10px',
-    color: 'var(--accent)',
-    fontWeight: '700',
-  },
-  subtitle: {
-    color: 'var(--text-secondary)',
-    marginBottom: '30px',
-    fontSize: '16px',
-  },
-  form: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '15px',
-  },
-  input: {
-    padding: '15px',
-    borderRadius: '12px',
-    border: '1px solid var(--card-border)',
-    background: 'rgba(255, 255, 255, 0.05)',
-    color: 'var(--text-primary)',
-    fontSize: '16px',
-    outline: 'none',
-    transition: 'border 0.3s',
-  },
-  button: {
-    padding: '15px',
-    borderRadius: '12px',
-    border: 'none',
-    background: 'var(--accent)',
-    color: 'var(--bg-primary)',
-    fontSize: '16px',
-    fontWeight: '600',
-    cursor: 'pointer',
-    transition: 'transform 0.2s, opacity 0.2s',
-  },
-  error: {
-    color: '#ff6b6b',
-    textAlign: 'center',
-    fontSize: '14px',
-  },
-};
 
 export default Login;
