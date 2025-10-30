@@ -58,52 +58,59 @@ function UserView() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-white text-xl">Učitavanje...</div>;
+    return <div className="min-h-screen flex items-center justify-center text-[#111827] text-xl">Učitavanje...</div>;
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <header className="flex items-center justify-between mb-10">
-        <h1 className="text-4xl font-bold text-primary">Tvoji Pokloni</h1>
-        <button onClick={handleLogout} className="py-2 px-4 rounded-lg border border-white/10 glass text-white">Odjavi se</button>
-      </header>
+    <div className="min-h-screen flex items-start justify-center p-8 bg-[#f5f4dc]">
+      <div className="w-full max-w-6xl relative mt-6">
+        {/* square offset shadow */}
+        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
-        {presents.map(present => (
-          <PresentCard
-            key={present.id}
-            present={present}
-            onOpen={handleOpenPresent}
-            isLocked={isPresentLocked(present)}
-          />
-        ))}
-      </div>
+        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6">
+          <header className="flex items-center justify-between mb-6">
+            <h1 className="text-3xl font-extrabold text-[#111827]">Tvoji Pokloni</h1>
+            <button onClick={handleLogout} className="py-2 px-4 border-2 border-black bg-[#111827] text-white">Odjavi se</button>
+          </header>
 
-      {selectedPresent && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setSelectedPresent(null)}>
-          <div className="bg-white/6 border border-white/10 rounded-2xl p-8 max-w-2xl w-full mx-4 relative" onClick={(e) => e.stopPropagation()}>
-            <button className="absolute top-4 right-4 text-white text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
-            <h2 className="text-2xl font-bold text-primary mb-4">Dan {selectedPresent.day}</h2>
-
-            {selectedPresent.type === 'text' && (
-              <p className="text-white leading-relaxed">{selectedPresent.content}</p>
-            )}
-
-            {selectedPresent.type === 'image' && (
-              <img src={selectedPresent.content} alt="Present" className="w-full rounded-lg mt-4" />
-            )}
-
-            {selectedPresent.type === 'song' && (
-              <div>
-                <p className="text-primary font-semibold mb-2">{selectedPresent.title}</p>
-                <audio controls className="w-full">
-                  <source src={selectedPresent.content} type="audio/mpeg" />
-                </audio>
-              </div>
-            )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {presents.map(present => (
+              <PresentCard
+                key={present.id}
+                present={present}
+                onOpen={handleOpenPresent}
+                isLocked={isPresentLocked(present)}
+              />
+            ))}
           </div>
+
+          {selectedPresent && (
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setSelectedPresent(null)}>
+              <div className="bg-[#fffdfd]/95 border-4 border-black p-8 max-w-2xl w-full mx-4 relative" onClick={(e) => e.stopPropagation()}>
+                <button className="absolute top-4 right-4 text-[#111827] text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
+                <h2 className="text-2xl font-bold text-[#111827] mb-4">Dan {selectedPresent.day}</h2>
+
+                {selectedPresent.type === 'text' && (
+                  <p className="text-[#111827] leading-relaxed">{selectedPresent.content}</p>
+                )}
+
+                {selectedPresent.type === 'image' && (
+                  <img src={selectedPresent.content} alt="Present" className="w-full mt-4" />
+                )}
+
+                {selectedPresent.type === 'song' && (
+                  <div>
+                    <p className="text-[#111827] font-semibold mb-2">{selectedPresent.title}</p>
+                    <audio controls className="w-full">
+                      <source src={selectedPresent.content} type="audio/mpeg" />
+                    </audio>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
-      )}
+      </div>
       <SplashCursor />
     </div>
   );
