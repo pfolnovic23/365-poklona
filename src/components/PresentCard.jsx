@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Gift, Lock, CheckCircle } from 'lucide-react';
 
 function PresentCard({ present, onOpen, isLocked }) {
   const [timeRemaining, setTimeRemaining] = useState('');
@@ -33,58 +34,66 @@ function PresentCard({ present, onOpen, isLocked }) {
   }, [present.unlockDate]);
 
   const handleClick = () => {
-    if (!isLocked && !present.opened) {
+    if (!isLocked) {
       onOpen(present);
     }
+  };
+
+  const getIcon = () => {
+    if (present.opened) return <CheckCircle size={32} color="var(--accent)" />;
+    if (isLocked) return <Lock size={32} color="var(--text-secondary)" />;
+    return <Gift size={32} color="var(--accent)" />;
   };
 
   return (
     <div
       style={{
         ...styles.card,
-        opacity: isLocked ? 0.5 : 1,
-        cursor: isLocked || present.opened ? 'not-allowed' : 'pointer',
-        transform: present.opened ? 'scale(0.95)' : 'scale(1)',
+        opacity: isLocked ? 0.7 : 1,
+        cursor: isLocked ? 'not-allowed' : 'pointer',
+        transform: present.opened ? 'scale(0.98)' : 'scale(1)',
       }}
       onClick={handleClick}
     >
-      <div style={styles.emoji}>
-        {present.opened ? '📭' : '🎁'}
+      <div style={styles.icon}>
+        {getIcon()}
       </div>
       <h3 style={styles.day}>Dan {present.day}</h3>
-      {isLocked && <p style={styles.locked}>🔒 {timeRemaining}</p>}
-      {present.opened && <p style={styles.opened}>✓ Otvoreno</p>}
+      {isLocked && <p style={styles.locked}>{timeRemaining}</p>}
+      {present.opened && <p style={styles.opened}>Otvoreno</p>}
     </div>
   );
 }
 
 const styles = {
   card: {
-    background: 'white',
-    borderRadius: '15px',
-    padding: '20px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: '16px',
+    padding: '24px',
     textAlign: 'center',
-    boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+    boxShadow: '0 8px 32px var(--shadow)',
+    backdropFilter: 'blur(10px)',
     transition: 'all 0.3s ease',
   },
-  emoji: {
-    fontSize: '48px',
-    marginBottom: '10px',
+  icon: {
+    marginBottom: '16px',
   },
   day: {
-    fontSize: '18px',
-    color: '#667eea',
-    marginBottom: '5px',
+    fontSize: '20px',
+    fontWeight: '600',
+    color: 'var(--text-primary)',
+    marginBottom: '8px',
   },
   locked: {
-    fontSize: '12px',
-    color: '#999',
-    marginTop: '5px',
+    fontSize: '14px',
+    color: 'var(--text-secondary)',
+    fontWeight: '500',
   },
   opened: {
-    fontSize: '12px',
-    color: '#27ae60',
-    marginTop: '5px',
+    fontSize: '14px',
+    color: 'var(--accent)',
+    fontWeight: '500',
   },
 };
 

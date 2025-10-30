@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
+import { Settings, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 
 function AdminDashboard() {
   const [presents, setPresents] = useState([]);
@@ -102,12 +103,17 @@ function AdminDashboard() {
   return (
     <div style={styles.container}>
       <header style={styles.header}>
-        <h1 style={styles.title}>⚙️ Admin Dashboard</h1>
+        <div style={styles.titleContainer}>
+          <Settings size={32} color="var(--accent)" />
+          <h1 style={styles.title}>Admin Dashboard</h1>
+        </div>
         <div style={styles.headerButtons}>
           <button onClick={() => setShowForm(!showForm)} style={styles.addBtn}>
-            {showForm ? 'Zatvori' : '+ Dodaj Poklon'}
+            <Plus size={16} />
+            {showForm ? 'Zatvori' : 'Dodaj Poklon'}
           </button>
           <button onClick={handleLogout} style={styles.logoutBtn}>
+            <LogOut size={16} />
             Odjavi se
           </button>
         </div>
@@ -206,14 +212,14 @@ function AdminDashboard() {
               <span style={styles.presentDay}>Dan {present.day}</span>
               <span style={styles.presentType}>{present.type}</span>
               <span style={styles.presentDate}>{present.unlockDate}</span>
-              {present.opened && <span style={styles.openedBadge}>✓ Otvoreno</span>}
+              {present.opened && <span style={styles.openedBadge}>Otvoreno</span>}
             </div>
             <div style={styles.presentActions}>
               <button onClick={() => handleEdit(present)} style={styles.editBtn}>
-                Uredi
+                <Edit size={14} />
               </button>
               <button onClick={() => handleDelete(present.id)} style={styles.deleteBtn}>
-                Obriši
+                <Trash2 size={14} />
               </button>
             </div>
           </div>
@@ -232,154 +238,197 @@ const styles = {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: '30px',
+    marginBottom: '40px',
     flexWrap: 'wrap',
-    gap: '10px',
+    gap: '15px',
+  },
+  titleContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '12px',
   },
   title: {
-    color: 'white',
+    color: 'var(--accent)',
     fontSize: '32px',
+    fontWeight: '700',
   },
   headerButtons: {
     display: 'flex',
-    gap: '10px',
+    gap: '12px',
   },
   addBtn: {
-    padding: '10px 20px',
-    background: '#27ae60',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '12px 20px',
+    background: 'var(--accent)',
     border: 'none',
-    borderRadius: '10px',
-    color: 'white',
+    borderRadius: '12px',
+    color: 'var(--bg-primary)',
     cursor: 'pointer',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
   },
   logoutBtn: {
-    padding: '10px 20px',
-    background: 'rgba(255,255,255,0.2)',
-    border: '2px solid white',
-    borderRadius: '10px',
-    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '8px',
+    padding: '12px 20px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: '12px',
+    color: 'var(--text-primary)',
     cursor: 'pointer',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    transition: 'all 0.3s ease',
   },
   formCard: {
-    background: 'white',
-    borderRadius: '15px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: '16px',
     padding: '30px',
     marginBottom: '30px',
     maxWidth: '600px',
+    boxShadow: '0 8px 32px var(--shadow)',
+    backdropFilter: 'blur(10px)',
   },
   formTitle: {
-    color: '#667eea',
+    color: 'var(--accent)',
     marginBottom: '20px',
+    fontSize: '24px',
+    fontWeight: '600',
   },
   form: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '15px',
+    gap: '20px',
   },
   formGroup: {
     display: 'flex',
     flexDirection: 'column',
-    gap: '5px',
+    gap: '8px',
   },
   label: {
-    fontWeight: 'bold',
-    color: '#333',
+    fontWeight: '500',
+    color: 'var(--text-primary)',
+    fontSize: '14px',
   },
   input: {
-    padding: '10px',
+    padding: '12px',
     borderRadius: '8px',
-    border: '2px solid #e0e0e0',
+    border: '1px solid var(--card-border)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    color: 'var(--text-primary)',
     fontSize: '16px',
     outline: 'none',
+    transition: 'border 0.3s',
   },
   formButtons: {
     display: 'flex',
-    gap: '10px',
+    gap: '12px',
     marginTop: '10px',
   },
   saveBtn: {
     flex: 1,
-    padding: '12px',
-    background: '#667eea',
-    color: 'white',
+    padding: '14px',
+    background: 'var(--accent)',
+    color: 'var(--bg-primary)',
     border: 'none',
     borderRadius: '8px',
     cursor: 'pointer',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    transition: 'transform 0.2s',
   },
   cancelBtn: {
     flex: 1,
-    padding: '12px',
-    background: '#e0e0e0',
-    color: '#333',
-    border: 'none',
+    padding: '14px',
+    background: 'transparent',
+    color: 'var(--text-secondary)',
+    border: '1px solid var(--card-border)',
     borderRadius: '8px',
     cursor: 'pointer',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    transition: 'all 0.3s',
   },
   list: {
-    background: 'white',
-    borderRadius: '15px',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
+    borderRadius: '16px',
     padding: '30px',
+    boxShadow: '0 8px 32px var(--shadow)',
+    backdropFilter: 'blur(10px)',
   },
   listTitle: {
-    color: '#667eea',
+    color: 'var(--accent)',
     marginBottom: '20px',
+    fontSize: '24px',
+    fontWeight: '600',
   },
   presentCard: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: '15px',
-    borderBottom: '1px solid #e0e0e0',
+    padding: '16px',
+    borderBottom: '1px solid var(--card-border)',
+    transition: 'background 0.3s ease',
     flexWrap: 'wrap',
-    gap: '10px',
+    gap: '12px',
   },
   presentInfo: {
     display: 'flex',
-    gap: '15px',
+    gap: '16px',
     alignItems: 'center',
     flexWrap: 'wrap',
   },
   presentDay: {
-    fontWeight: 'bold',
-    color: '#667eea',
+    fontWeight: '600',
+    color: 'var(--accent)',
+    fontSize: '16px',
   },
   presentType: {
-    padding: '4px 8px',
-    background: '#f0f0f0',
-    borderRadius: '5px',
+    padding: '4px 12px',
+    background: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: '20px',
     fontSize: '12px',
+    color: 'var(--text-secondary)',
+    fontWeight: '500',
   },
   presentDate: {
-    color: '#999',
+    color: 'var(--text-secondary)',
     fontSize: '14px',
   },
   openedBadge: {
-    color: '#27ae60',
+    color: 'var(--accent)',
     fontSize: '12px',
+    fontWeight: '500',
   },
   presentActions: {
     display: 'flex',
-    gap: '10px',
+    gap: '8px',
   },
   editBtn: {
-    padding: '8px 15px',
-    background: '#3498db',
-    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    background: 'var(--accent)',
+    color: 'var(--bg-primary)',
     border: 'none',
-    borderRadius: '5px',
+    borderRadius: '6px',
     cursor: 'pointer',
+    fontSize: '12px',
+    transition: 'transform 0.2s',
   },
   deleteBtn: {
-    padding: '8px 15px',
-    background: '#e74c3c',
-    color: 'white',
-    border: 'none',
-    borderRadius: '5px',
+    display: 'flex',
+    alignItems: 'center',
+    padding: '8px 12px',
+    background: 'transparent',
+    color: 'var(--text-secondary)',
+    border: '1px solid var(--card-border)',
+    borderRadius: '6px',
     cursor: 'pointer',
+    fontSize: '12px',
+    transition: 'all 0.3s',
   },
 };
 

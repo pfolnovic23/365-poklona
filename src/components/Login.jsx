@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+import { Gift } from 'lucide-react';
 
 function Login() {
   const [email, setEmail] = useState('');
@@ -24,8 +25,11 @@ function Login() {
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h1 style={styles.title}>🎁 365 Poklona</h1>
-        <p style={styles.subtitle}>Prijavi se da otvoriš svoje poklon</p>
+        <div style={styles.icon}>
+          <Gift size={48} color="var(--accent)" />
+        </div>
+        <h1 style={styles.title}>365 Poklona</h1>
+        <p style={styles.subtitle}>Prijavi se da otvoriš svoje poklone</p>
         
         <form onSubmit={handleLogin} style={styles.form}>
           <input
@@ -65,23 +69,29 @@ const styles = {
     padding: '20px',
   },
   card: {
-    background: 'white',
+    background: 'var(--card-bg)',
+    border: '1px solid var(--card-border)',
     borderRadius: '20px',
     padding: '40px',
     maxWidth: '400px',
     width: '100%',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+    boxShadow: '0 20px 60px var(--shadow)',
+    backdropFilter: 'blur(10px)',
+    textAlign: 'center',
+  },
+  icon: {
+    marginBottom: '20px',
   },
   title: {
     fontSize: '32px',
     marginBottom: '10px',
-    textAlign: 'center',
-    color: '#667eea',
+    color: 'var(--accent)',
+    fontWeight: '700',
   },
   subtitle: {
-    textAlign: 'center',
-    color: '#666',
+    color: 'var(--text-secondary)',
     marginBottom: '30px',
+    fontSize: '16px',
   },
   form: {
     display: 'flex',
@@ -90,25 +100,27 @@ const styles = {
   },
   input: {
     padding: '15px',
-    borderRadius: '10px',
-    border: '2px solid #e0e0e0',
+    borderRadius: '12px',
+    border: '1px solid var(--card-border)',
+    background: 'rgba(255, 255, 255, 0.05)',
+    color: 'var(--text-primary)',
     fontSize: '16px',
     outline: 'none',
     transition: 'border 0.3s',
   },
   button: {
     padding: '15px',
-    borderRadius: '10px',
+    borderRadius: '12px',
     border: 'none',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: 'white',
+    background: 'var(--accent)',
+    color: 'var(--bg-primary)',
     fontSize: '16px',
-    fontWeight: 'bold',
+    fontWeight: '600',
     cursor: 'pointer',
-    transition: 'transform 0.2s',
+    transition: 'transform 0.2s, opacity 0.2s',
   },
   error: {
-    color: '#e74c3c',
+    color: '#ff6b6b',
     textAlign: 'center',
     fontSize: '14px',
   },
