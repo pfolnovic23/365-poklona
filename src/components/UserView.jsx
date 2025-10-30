@@ -52,6 +52,13 @@ function UserView() {
     return today < unlockDate;
   };
 
+  const formatDateTime = (iso) => {
+    if (!iso) return '';
+    const d = new Date(iso);
+    const pad = (n) => n.toString().padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  };
+
   const handleLogout = () => {
     signOut(auth);
   };
@@ -96,7 +103,11 @@ function UserView() {
             <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setSelectedPresent(null)}>
               <div className="bg-[#fffdfd]/95 border-4 border-black p-8 max-w-2xl w-full mx-4 relative" onClick={(e) => e.stopPropagation()}>
                 <button className="absolute top-4 right-4 text-[#111827] text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
-                <h2 className="text-2xl font-bold text-[#111827] mb-4">Dan {selectedPresent.day}</h2>
+                <h2 className="text-2xl font-bold text-[#111827] mb-2">Dan {selectedPresent.day}</h2>
+
+                {selectedPresent.opened && selectedPresent.openedAt && (
+                  <p className="text-sm text-gray-600 mb-3">Otvoreno: {formatDateTime(selectedPresent.openedAt)}</p>
+                )}
 
                 {selectedPresent.type === 'text' && (
                   <p className="text-[#111827] leading-relaxed">{selectedPresent.content}</p>
@@ -114,6 +125,9 @@ function UserView() {
                     </audio>
                   </div>
                 )}
+                <div className="mt-6 flex justify-end">
+                  <button onClick={() => setSelectedPresent(null)} className="px-4 py-2 border-2 border-black bg-[#f6f4ee] text-[#111827]">Zatvori</button>
+                </div>
               </div>
             </div>
           )}

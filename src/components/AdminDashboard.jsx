@@ -85,6 +85,17 @@ function AdminDashboard() {
     }
   };
 
+  // Allow admin to 'pack' a present again (mark as not opened and clear openedAt)
+  const packPresent = async (id) => {
+    if (!window.confirm('Želiš li zaista vratiti ovaj poklon u stanje "spakirano"?')) return;
+    try {
+      await updateDoc(doc(db, 'presents', id), { opened: false, openedAt: null });
+      loadPresents();
+    } catch (error) {
+      console.error('Error re-packing present:', error);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       day: '',
@@ -214,6 +225,9 @@ function AdminDashboard() {
                   <div className="flex items-center gap-2">
                     <button onClick={() => { handleEdit(present); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="p-2 bg-[#111827] text-white border-2 border-black"><Edit size={14} /></button>
                     <button onClick={() => handleDelete(present.id)} className="p-2 border-2 border-black bg-[#f6f4ee] text-[#111827]"><Trash2 size={14} /></button>
+                    {present.opened && (
+                      <button onClick={() => packPresent(present.id)} className="p-2 border-2 border-black bg-[#fff] text-[#111827]">Spakiraj</button>
+                    )}
                   </div>
                 </div>
               ))}
