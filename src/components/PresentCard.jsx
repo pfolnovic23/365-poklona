@@ -45,13 +45,14 @@ function PresentCard({ present, onOpen, isLocked }) {
 
   return (
     <div
-      className={`card glass ${isLocked ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'} transform transition-all duration-300`}
+      className={`p-6 border-2 border-black bg-[#f6f4ee] text-[#111827] ${isLocked ? 'opacity-75 cursor-not-allowed' : 'hover:scale-105 cursor-pointer'} transform transition-all duration-300`}
       onClick={handleClick}
+      style={{ borderRadius: 0 }}
     >
       <div className="mb-4">{getIcon()}</div>
-      <h3 className="text-lg font-semibold text-white mb-2">Dan {present.day}</h3>
-      {isLocked && <p className="text-sm text-gray-300">{timeRemaining}</p>}
-      {present.opened && <p className="text-sm text-primary font-medium">Otvoreno</p>}
+      <h3 className="text-lg font-semibold mb-2">Dan {present.day}</h3>
+      {isLocked && <p className="text-sm text-[#666]">{timeRemaining}</p>}
+      {present.opened && <p className="text-sm text-[#667eea] font-medium">Otvoreno</p>}
     </div>
   );
 }

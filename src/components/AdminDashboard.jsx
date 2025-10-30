@@ -3,11 +3,11 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Settings, Plus, Edit, Trash2, LogOut } from 'lucide-react';
-import SplashCursor from './SplashCursor';
 
 function AdminDashboard() {
   const [presents, setPresents] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [minimized, setMinimized] = useState(false);
   const [editingPresent, setEditingPresent] = useState(null);
   
   const [formData, setFormData] = useState({
@@ -85,6 +85,17 @@ function AdminDashboard() {
     }
   };
 
+  // Allow admin to 'pack' a present again (mark as not opened and clear openedAt)
+  const packPresent = async (id) => {
+    if (!window.confirm('Želiš li zaista vratiti ovaj poklon u stanje "spakirano"?')) return;
+    try {
+      await updateDoc(doc(db, 'presents', id), { opened: false, openedAt: null });
+      loadPresents();
+    } catch (error) {
+      console.error('Error re-packing present:', error);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       day: '',
@@ -101,88 +112,130 @@ function AdminDashboard() {
     signOut(auth);
   };
 
+  // Open the form for adding a new present (clears any editing state)
+  const openAddForm = () => {
+    // If the form was minimized, restore it with preserved data
+    if (minimized) {
+      setShowForm(true);
+      setMinimized(false);
+      return;
+    }
+    setEditingPresent(null);
+    setFormData({ day: '', type: 'text', title: '', content: '', unlockDate: '' });
+    setShowForm(true);
+    setMinimized(false);
+  };
+
+  const minimizeForm = () => {
+    // hide the form but keep formData so it can be restored
+    setShowForm(false);
+    setMinimized(true);
+  };
+
+  const restoreForm = () => {
+    setShowForm(true);
+    setMinimized(false);
+  };
+
   return (
-    <div className="min-h-screen p-6">
-      <header className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Settings size={28} className="text-primary" />
-          <h1 className="text-2xl font-bold text-white">Admin Dashboard</h1>
-        </div>
-        <div className="flex items-center gap-3">
-          <button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 bg-primary text-white px-4 py-2 rounded-lg">
-            <Plus size={14} />
-            {showForm ? 'Zatvori' : 'Dodaj Poklon'}
-          </button>
-          <button onClick={handleLogout} className="flex items-center gap-2 glass border px-4 py-2 rounded-lg text-white">
-            <LogOut size={14} />
-            Odjavi se
-          </button>
-        </div>
-      </header>
+    <div className="min-h-screen flex items-start justify-center p-6 bg-[#f5f4dc]">
+      <div className="w-full max-w-6xl relative mt-6">
+        {/* square offset shadow */}
+        <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
 
-      {showForm && (
-        <div className="glass border rounded-2xl p-6 mb-6 max-w-2xl">
-          <h2 className="text-xl font-semibold text-primary mb-4">{editingPresent ? 'Uredi Poklon' : 'Novi Poklon'}</h2>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="flex flex-col">
-              <label className="text-sm text-white font-medium">Dan (1-365)</label>
-              <input type="number" min="1" max="365" value={formData.day} onChange={(e) => setFormData({...formData, day: e.target.value})} className="mt-1 p-3 rounded-lg bg-white/5 border border-white/10 text-white" required />
+        <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6">
+          <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
+            <div className="flex items-center gap-4">
+              <Settings size={28} className="text-[#111827]" />
+              <h1 className="text-2xl font-extrabold text-[#111827]">Admin Dashboard</h1>
             </div>
 
-            <div className="flex flex-col">
-              <label className="text-sm text-white font-medium">Tip</label>
-              <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="mt-1 p-3 rounded-lg bg-white/5 border border-white/10 text-white">
-                <option value="text">Tekst</option>
-                <option value="image">Slika</option>
-                <option value="song">Pjesma</option>
-              </select>
+            <div className="flex items-center gap-3">
+              <button onClick={openAddForm} className="flex items-center gap-2 bg-[#111827] text-white px-4 py-2 border-2 border-black">
+                <Plus size={14} />
+                <span className="text-sm">Dodaj Poklon</span>
+              </button>
+              <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 border-2 border-black bg-[#f6f4ee] text-[#111827]">
+                <LogOut size={14} />
+                <span className="text-sm">Odjavi se</span>
+              </button>
             </div>
+          </header>
 
-            {formData.type === 'song' && (
-              <div className="flex flex-col">
-                <label className="text-sm text-white font-medium">Naslov</label>
-                <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="mt-1 p-3 rounded-lg bg-white/5 border border-white/10 text-white" placeholder="Naziv pjesme" />
+          {showForm && (
+            <div className="mb-6 relative">
+              <h2 className="text-xl font-semibold text-[#111827] mb-4">{editingPresent ? 'Uredi Poklon' : 'Novi Poklon'}</h2>
+              {/* Close and minimize controls for the form */}
+              <div className="absolute top-0 right-0 flex gap-2">
+                <button type="button" onClick={minimizeForm} title="Minimize form" className="px-3 py-1 border-2 border-black bg-[#f6f4ee]">−</button>
+                <button type="button" onClick={resetForm} title="Close form" className="px-3 py-1 border-2 border-black bg-[#f6f4ee]">✕</button>
               </div>
-            )}
 
-            <div className="flex flex-col">
-              <label className="text-sm text-white font-medium">{formData.type === 'text' ? 'Tekst' : 'URL'}</label>
-              <textarea value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="mt-1 p-3 rounded-lg bg-white/5 border border-white/10 text-white min-h-[100px]" placeholder={formData.type === 'text' ? 'Upiši poruku...' : 'https://...'} required />
-            </div>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+                <div className="flex flex-col">
+                  <label className="text-sm text-[#111827] font-medium">Dan (1-365)</label>
+                  <input type="number" min="1" max="365" value={formData.day} onChange={(e) => setFormData({...formData, day: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" required />
+                </div>
 
-            <div className="flex flex-col">
-              <label className="text-sm text-white font-medium">Datum otključavanja</label>
-              <input type="date" value={formData.unlockDate} onChange={(e) => setFormData({...formData, unlockDate: e.target.value})} className="mt-1 p-3 rounded-lg bg-white/5 border border-white/10 text-white" required />
-            </div>
+                <div className="flex flex-col">
+                  <label className="text-sm text-[#111827] font-medium">Tip</label>
+                  <select value={formData.type} onChange={(e) => setFormData({...formData, type: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]">
+                    <option value="text">Tekst</option>
+                    <option value="image">Slika</option>
+                    <option value="song">Pjesma</option>
+                  </select>
+                </div>
 
-            <div className="flex gap-4">
-              <button type="submit" className="flex-1 py-3 bg-primary text-white rounded-lg font-semibold">{editingPresent ? 'Spremi' : 'Dodaj'}</button>
-              <button type="button" onClick={resetForm} className="flex-1 py-3 border border-white/10 rounded-lg text-white">Odustani</button>
-            </div>
-          </form>
-        </div>
-      )}
+                {formData.type === 'song' && (
+                  <div className="flex flex-col">
+                    <label className="text-sm text-[#111827] font-medium">Naslov</label>
+                    <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" placeholder="Naziv pjesme" />
+                  </div>
+                )}
 
-      <div className="glass border rounded-2xl p-6">
-        <h2 className="text-lg text-primary font-semibold mb-4">Svi Pokloni ({presents.length})</h2>
-        <div className="space-y-3">
-          {presents.map(present => (
-            <div key={present.id} className="flex items-center justify-between p-3 border-b border-white/6">
-              <div className="flex items-center gap-4">
-                <span className="font-semibold text-primary">Dan {present.day}</span>
-                <span className="text-sm text-white/80 bg-white/5 px-3 py-1 rounded-full">{present.type}</span>
-                <span className="text-sm text-white/60">{present.unlockDate}</span>
-                {present.opened && <span className="text-sm text-primary">Otvoreno</span>}
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={() => handleEdit(present)} className="p-2 bg-primary text-white rounded-md"><Edit size={14} /></button>
-                <button onClick={() => handleDelete(present.id)} className="p-2 border border-white/10 rounded-md text-white"><Trash2 size={14} /></button>
-              </div>
+                <div className="flex flex-col">
+                  <label className="text-sm text-[#111827] font-medium">{formData.type === 'text' ? 'Tekst' : 'URL'}</label>
+                  <textarea value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827] min-h-[100px]" placeholder={formData.type === 'text' ? 'Upiši poruku...' : 'https://...'} required />
+                </div>
+
+                <div className="flex flex-col">
+                  <label className="text-sm text-[#111827] font-medium">Datum otključavanja</label>
+                  <input type="date" value={formData.unlockDate} onChange={(e) => setFormData({...formData, unlockDate: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" required />
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button type="submit" className="flex-1 py-3 bg-[#111827] text-white border-2 border-black font-semibold">{editingPresent ? 'Spremi' : 'Dodaj'}</button>
+                  <button type="button" onClick={resetForm} className="flex-1 py-3 border-2 border-black bg-[#f6f4ee] text-[#111827]">Odustani</button>
+                </div>
+              </form>
             </div>
-          ))}
+          )}
+
+          <div>
+            <h2 className="text-lg font-semibold text-[#111827] mb-4">Svi Pokloni ({presents.length})</h2>
+            <div className="flex flex-col gap-4">
+              {presents.map(present => (
+                <div key={present.id} className="p-4 border-2 border-black bg-[#f6f4ee] flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <span className="font-semibold text-[#111827]">Dan {present.day}</span>
+                    <span className="text-sm text-[#111827] bg-[#fff] px-2 py-1 border-2 border-black">{present.type}</span>
+                    <span className="text-sm text-[#666]">{present.unlockDate}</span>
+                    {present.opened && <span className="text-sm text-[#667eea]">Otvoreno</span>}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => { handleEdit(present); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="p-2 bg-[#111827] text-white border-2 border-black"><Edit size={14} /></button>
+                    <button onClick={() => handleDelete(present.id)} className="p-2 border-2 border-black bg-[#f6f4ee] text-[#111827]"><Trash2 size={14} /></button>
+                    {present.opened && (
+                      <button onClick={() => packPresent(present.id)} className="p-2 border-2 border-black bg-[#fff] text-[#111827]">Spakiraj</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
-      <SplashCursor />
+  {/* SplashCursor is mounted at App root to avoid duplicates */}
     </div>
   );
 }
