@@ -710,6 +710,8 @@ function SplashCursor({
     initFramebuffers();
     let lastUpdateTime = Date.now();
     let colorUpdateTimer = 0.0;
+    let rafId = null;
+    let running = false;
 
     function updateFrame() {
       const dt = calcDeltaTime();
@@ -718,7 +720,7 @@ function SplashCursor({
       applyInputs();
       step(dt);
       render(null);
-      requestAnimationFrame(updateFrame);
+      rafId = requestAnimationFrame(updateFrame);
     }
 
     function calcDeltaTime() {
@@ -1022,45 +1024,33 @@ function SplashCursor({
       return hash;
     }
 
-    window.addEventListener('mousedown', e => {
+    // Event handlers (named so they can be removed)
+    const onMouseDown = (e) => {
       let pointer = pointers[0];
       let posX = scaleByPixelRatio(e.clientX);
       let posY = scaleByPixelRatio(e.clientY);
       updatePointerDownData(pointer, -1, posX, posY);
       clickSplat(pointer);
-    });
+    };
 
-    document.body.addEventListener('mousemove', function handleFirstMouseMove(e) {
+    const onFirstMouseMove = (e) => {
       let pointer = pointers[0];
       let posX = scaleByPixelRatio(e.clientX);
       let posY = scaleByPixelRatio(e.clientY);
       let color = generateColor();
-      updateFrame();
       updatePointerMoveData(pointer, posX, posY, color);
-      document.body.removeEventListener('mousemove', handleFirstMouseMove);
-    });
+      document.body.removeEventListener('mousemove', onFirstMouseMove);
+    };
 
-    window.addEventListener('mousemove', e => {
+    const onMouseMove = (e) => {
       let pointer = pointers[0];
       let posX = scaleByPixelRatio(e.clientX);
       let posY = scaleByPixelRatio(e.clientY);
       let color = pointer.color;
       updatePointerMoveData(pointer, posX, posY, color);
-    });
+    };
 
-    document.body.addEventListener('touchstart', function handleFirstTouchStart(e) {
-      const touches = e.targetTouches;
-      let pointer = pointers[0];
-      for (let i = 0; i < touches.length; i++) {
-        let posX = scaleByPixelRatio(touches[i].clientX);
-        let posY = scaleByPixelRatio(touches[i].clientY);
-        updateFrame();
-        updatePointerDownData(pointer, touches[i].identifier, posX, posY);
-      }
-      document.body.removeEventListener('touchstart', handleFirstTouchStart);
-    });
-
-    window.addEventListener('touchstart', e => {
+    const onFirstTouchStart = (e) => {
       const touches = e.targetTouches;
       let pointer = pointers[0];
       for (let i = 0; i < touches.length; i++) {
@@ -1068,9 +1058,20 @@ function SplashCursor({
         let posY = scaleByPixelRatio(touches[i].clientY);
         updatePointerDownData(pointer, touches[i].identifier, posX, posY);
       }
-    });
+      document.body.removeEventListener('touchstart', onFirstTouchStart);
+    };
 
-    window.addEventListener('touchmove', e => {
+    const onTouchStart = (e) => {
+      const touches = e.targetTouches;
+      let pointer = pointers[0];
+      for (let i = 0; i < touches.length; i++) {
+        let posX = scaleByPixelRatio(touches[i].clientX);
+        let posY = scaleByPixelRatio(touches[i].clientY);
+        updatePointerDownData(pointer, touches[i].identifier, posX, posY);
+      }
+    };
+
+    const onTouchMove = (e) => {
       const touches = e.targetTouches;
       let pointer = pointers[0];
       for (let i = 0; i < touches.length; i++) {
@@ -1078,17 +1079,45 @@ function SplashCursor({
         let posY = scaleByPixelRatio(touches[i].clientY);
         updatePointerMoveData(pointer, posX, posY, pointer.color);
       }
-    }, false);
+    };
 
-    window.addEventListener('touchend', e => {
+    const onTouchEnd = (e) => {
       const touches = e.changedTouches;
       let pointer = pointers[0];
       for (let i = 0; i < touches.length; i++) {
         updatePointerUpData(pointer);
       }
-    });
+    };
 
-    updateFrame();
+    window.addEventListener('mousedown', onMouseDown);
+    document.body.addEventListener('mousemove', onFirstMouseMove);
+    window.addEventListener('mousemove', onMouseMove);
+    document.body.addEventListener('touchstart', onFirstTouchStart);
+    window.addEventListener('touchstart', onTouchStart);
+    window.addEventListener('touchmove', onTouchMove, false);
+    window.addEventListener('touchend', onTouchEnd);
+
+    // Start the render loop once
+    if (!running) {
+      running = true;
+      rafId = requestAnimationFrame(updateFrame);
+    }
+
+    // cleanup: remove listeners and stop RAF when component unmounts
+    return () => {
+      try {
+        window.removeEventListener('mousedown', onMouseDown);
+        document.body.removeEventListener('mousemove', onFirstMouseMove);
+        window.removeEventListener('mousemove', onMouseMove);
+        document.body.removeEventListener('touchstart', onFirstTouchStart);
+        window.removeEventListener('touchstart', onTouchStart);
+        window.removeEventListener('touchmove', onTouchMove, false);
+        window.removeEventListener('touchend', onTouchEnd);
+      } catch (e) {
+        // ignore
+      }
+      if (rafId) cancelAnimationFrame(rafId);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     SIM_RESOLUTION,

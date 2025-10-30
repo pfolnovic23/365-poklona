@@ -3,7 +3,6 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Settings, Plus, Edit, Trash2, LogOut } from 'lucide-react';
-import SplashCursor from './SplashCursor';
 
 function AdminDashboard() {
   const [presents, setPresents] = useState([]);
@@ -222,7 +221,7 @@ function AdminDashboard() {
           </div>
         </div>
       </div>
-      <SplashCursor />
+  {/* SplashCursor is mounted at App root to avoid duplicates */}
     </div>
   );
 }

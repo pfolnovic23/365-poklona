@@ -3,7 +3,6 @@ import { collection, getDocs, doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import PresentCard from './PresentCard';
-import SplashCursor from './SplashCursor';
 
 function UserView() {
   const [presents, setPresents] = useState([]);
@@ -58,7 +57,16 @@ function UserView() {
   };
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-[#111827] text-xl">Učitavanje...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center p-8 bg-[#f5f4dc]">
+        <div className="w-full max-w-md relative">
+          <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-8 text-center" style={{ boxShadow: '16px 16px 0 0 #000' }}>
+            <h2 className="text-2xl font-bold text-[#111827] mb-2">Učitavanje</h2>
+            <p className="text-sm text-gray-700">Molimo pričekajte...</p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -111,7 +119,7 @@ function UserView() {
           )}
         </div>
       </div>
-      <SplashCursor />
+  {/* SplashCursor is mounted at App root to avoid duplicates */}
     </div>
   );
 }
