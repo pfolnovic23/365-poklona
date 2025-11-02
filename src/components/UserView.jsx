@@ -220,7 +220,7 @@ function UserView() {
                   </div>
                 )}
                 <div className="mt-6 flex justify-end gap-2">
-                  <button onClick={() => setSelectedPresent(null)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border-2 border-black bg-[#f6f4ee] text-[#111827] hover:bg-[#e8e6dc] transition-colors">Zatvori</button>
+                  <button onClick={() => setSelectedPresent(null)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border-2 border-black bg-[#111827] text-white hover:bg-black transition-colors">Zatvori</button>
                 </div>
               </div>
             </div>

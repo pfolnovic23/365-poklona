@@ -36,6 +36,8 @@ function AdminDashboard() {
   const [editingPresent, setEditingPresent] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [upcomingPlaceholders, setUpcomingPlaceholders] = useState([]);
+  const [showAlert, setShowAlert] = useState(false);
   
   const [formData, setFormData] = useState({
     day: '',
@@ -223,6 +225,25 @@ function AdminDashboard() {
     signOut(auth);
   };
 
+  // Check for presents opening in next 8 hours with placeholder content
+  const checkUpcomingPlaceholders = () => {
+    const now = new Date();
+    const eightHoursFromNow = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+
+    const upcoming = presents.filter(present => {
+      const unlockDate = new Date(present.unlockDate);
+      const isPlaceholder = present.type === 'text' && 
+        present.content && 
+        present.content.includes('PavelVoliTaru');
+      const isUpcoming = unlockDate > now && unlockDate <= eightHoursFromNow;
+      
+      return isPlaceholder && isUpcoming;
+    });
+
+    setUpcomingPlaceholders(upcoming);
+    setShowAlert(upcoming.length > 0);
+  };
+
   // Open the form for adding a new present (clears any editing state)
   const openAddForm = () => {
     // If the form was minimized, restore it with preserved data
@@ -295,8 +316,39 @@ function AdminDashboard() {
               >
                 Obriši Sve Poklone
               </button>
+              <button
+                onClick={checkUpcomingPlaceholders}
+                disabled={loading}
+                className="py-2 px-3 text-xs sm:text-sm border-2 border-orange-600 bg-orange-100 text-orange-800 hover:bg-orange-200 transition-colors disabled:opacity-50 font-semibold"
+              >
+                Provjeri Placeholdere (8h)
+              </button>
             </div>
             {loading && <p className="text-xs text-[#111827] mt-2">Obrada u tijeku...</p>}
+            
+            {/* Alert for upcoming placeholders */}
+            {showAlert && upcomingPlaceholders.length > 0 && (
+              <div className="mt-4 p-3 bg-orange-50 border-2 border-orange-500">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-bold text-orange-800 mb-2">UPOZORENJE: {upcomingPlaceholders.length} placeholder(a) se otvara za manje od 8h!</h4>
+                    <ul className="text-xs text-orange-700 space-y-1">
+                      {upcomingPlaceholders.map(present => (
+                        <li key={present.id}>
+                          Dan {present.day} - Otvara se: {present.unlockDate}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <button 
+                    onClick={() => setShowAlert(false)}
+                    className="text-orange-800 font-bold hover:text-orange-900"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
 
           {showForm && (
@@ -430,25 +482,35 @@ function AdminDashboard() {
           <div>
             <h2 className="text-lg font-semibold text-[#111827] mb-4">Svi Pokloni ({presents.length})</h2>
             <div className="flex flex-col gap-4">
-              {presents.map(present => (
-                <div key={present.id} className="p-3 sm:p-4 border-2 border-black bg-[#f6f4ee] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
-                    <span className="font-semibold text-[#111827]">Dan {present.day}</span>
-                    <span className="text-sm text-[#111827] bg-[#fff] px-2 py-1 border-2 border-black">{present.type}</span>
-                    <span className="text-sm text-[#666]">{present.unlockDate}</span>
-                    {present.opened && (
-                      <span className="text-sm text-[#667eea] mt-1 sm:mt-0">Otvoreno: {present.openedAt ? formatDateTime(present.openedAt) : ''}</span>
-                    )}
+              {presents.map(present => {
+                // Check if present has placeholder content
+                const isPlaceholder = present.type === 'text' && 
+                  present.content && 
+                  present.content.includes('PavelVoliTaru');
+                
+                return (
+                  <div key={present.id} className={`p-3 sm:p-4 border-2 border-black flex flex-col sm:flex-row sm:items-center justify-between gap-3 ${isPlaceholder ? 'bg-yellow-100' : 'bg-[#f6f4ee]'}`}>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                      <span className="font-semibold text-[#111827]">Dan {present.day}</span>
+                      <span className="text-sm text-[#111827] bg-[#fff] px-2 py-1 border-2 border-black">{present.type}</span>
+                      {isPlaceholder && (
+                        <span className="text-xs bg-yellow-500 text-white px-2 py-1 border-2 border-black font-bold">PLACEHOLDER</span>
+                      )}
+                      <span className="text-sm text-[#666]">{present.unlockDate}</span>
+                      {present.opened && (
+                        <span className="text-sm text-[#667eea] mt-1 sm:mt-0">Otvoreno: {present.openedAt ? formatDateTime(present.openedAt) : ''}</span>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap mt-2 sm:mt-0">
+                      <button onClick={() => { handleEdit(present); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="p-2 bg-[#111827] text-white border-2 border-black"><Edit size={14} /></button>
+                      <button onClick={() => handleDelete(present.id)} className="p-2 border-2 border-black bg-[#f6f4ee] text-[#111827]"><Trash2 size={14} /></button>
+                      {present.opened && (
+                        <button onClick={() => packPresent(present.id)} className="p-2 border-2 border-black bg-[#fff] text-[#111827]">Spakiraj</button>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-wrap mt-2 sm:mt-0">
-                    <button onClick={() => { handleEdit(present); window.scrollTo({ top: 0, behavior: 'smooth' }); }} className="p-2 bg-[#111827] text-white border-2 border-black"><Edit size={14} /></button>
-                    <button onClick={() => handleDelete(present.id)} className="p-2 border-2 border-black bg-[#f6f4ee] text-[#111827]"><Trash2 size={14} /></button>
-                    {present.opened && (
-                      <button onClick={() => packPresent(present.id)} className="p-2 border-2 border-black bg-[#fff] text-[#111827]">Spakiraj</button>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
