@@ -4,11 +4,36 @@ import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Settings, Plus, Edit, Trash2, LogOut } from 'lucide-react';
 
+// Cloudinary upload function
+const uploadToCloudinary = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET);
+
+  try {
+    const response = await fetch(
+      `https://api.cloudinary.com/v1_1/${import.meta.env.VITE_CLOUDINARY_CLOUD_NAME}/image/upload`,
+      {
+        method: 'POST',
+        body: formData
+      }
+    );
+
+    if (!response.ok) throw new Error('Upload failed');
+    const data = await response.json();
+    return data.secure_url;
+  } catch (error) {
+    console.error('Cloudinary upload error:', error);
+    return null;
+  }
+};
+
 function AdminDashboard() {
   const [presents, setPresents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [minimized, setMinimized] = useState(false);
   const [editingPresent, setEditingPresent] = useState(null);
+  const [uploading, setUploading] = useState(false);
   
   const [formData, setFormData] = useState({
     day: '',
@@ -17,6 +42,7 @@ function AdminDashboard() {
     content: '',
     unlockDate: '',
   });
+  const [imageFile, setImageFile] = useState(null);
 
   useEffect(() => {
     loadPresents();
@@ -40,11 +66,32 @@ function AdminDashboard() {
     e.preventDefault();
     
     try {
+      let contentValue = formData.content;
+
+      // Upload image if file is selected and type is "image"
+      if (formData.type === 'image' && imageFile) {
+        setUploading(true);
+        const imageUrl = await uploadToCloudinary(imageFile);
+        setUploading(false);
+        
+        if (!imageUrl) {
+          alert('Greška pri učitavanju slike');
+          return;
+        }
+        contentValue = imageUrl;
+      }
+
+      // Validate that image type has an image
+      if (formData.type === 'image' && !contentValue) {
+        alert('Molimo odaberi sliku');
+        return;
+      }
+
       const presentData = {
         day: parseInt(formData.day),
         type: formData.type,
         title: formData.title,
-        content: formData.content,
+        content: contentValue,
         unlockDate: formData.unlockDate,
         opened: false,
       };
@@ -59,6 +106,7 @@ function AdminDashboard() {
       loadPresents();
     } catch (error) {
       console.error('Error saving present:', error);
+      alert('Greška pri spremanju poklona');
     }
   };
 
@@ -111,6 +159,7 @@ function AdminDashboard() {
       content: '',
       unlockDate: '',
     });
+    setImageFile(null);
     setEditingPresent(null);
     setShowForm(false);
   };
@@ -193,6 +242,58 @@ function AdminDashboard() {
                   </select>
                 </div>
 
+                {formData.type === 'image' && (
+                  <div className="flex flex-col">
+                    <label className="text-sm text-[#111827] font-medium">Učitaj sliku</label>
+                    
+                    {/* Show preview if image already exists (editing) */}
+                    {editingPresent && formData.content && !imageFile && (
+                      <div className="mt-2 mb-3">
+                        <img 
+                          src={formData.content} 
+                          alt="Current" 
+                          className="w-full max-h-48 object-cover border-2 border-black"
+                        />
+                        <p className="text-xs text-gray-600 mt-2">Trenutna slika</p>
+                        <button
+                          type="button"
+                          onClick={() => setFormData({...formData, content: ''})}
+                          className="mt-2 px-3 py-1 text-xs border-2 border-black bg-red-200 text-red-800 font-semibold"
+                        >
+                          Ukloni sliku
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Show new file preview if selected */}
+                    {imageFile && (
+                      <div className="mt-2 mb-3">
+                        <img 
+                          src={URL.createObjectURL(imageFile)} 
+                          alt="Preview" 
+                          className="w-full max-h-48 object-cover border-2 border-black"
+                        />
+                        <p className="text-xs text-gray-600 mt-2">Nova slika: {imageFile.name}</p>
+                        <button
+                          type="button"
+                          onClick={() => setImageFile(null)}
+                          className="mt-2 px-3 py-1 text-xs border-2 border-black bg-gray-200 text-gray-800 font-semibold"
+                        >
+                          Ukloni novu sliku
+                        </button>
+                      </div>
+                    )}
+
+                    {/* File input */}
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      onChange={(e) => setImageFile(e.target.files?.[0] || null)} 
+                      className="mt-2 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" 
+                    />
+                  </div>
+                )}
+
                 {formData.type === 'song' && (
                   <div className="flex flex-col">
                     <label className="text-sm text-[#111827] font-medium">Naslov</label>
@@ -202,21 +303,21 @@ function AdminDashboard() {
 
                 <div className="flex flex-col">
                   <label className="text-sm text-[#111827] font-medium">
-                    {formData.type === 'text' ? 'Tekst' : formData.type === 'song' ? 'Spotify ili YouTube URL' : 'Slika URL'}
+                    {formData.type === 'text' ? 'Tekst' : formData.type === 'song' ? 'Spotify ili YouTube URL' : ''}
                   </label>
-                  <textarea 
-                    value={formData.content} 
-                    onChange={(e) => setFormData({...formData, content: e.target.value})} 
-                    className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827] min-h-[100px]" 
-                    placeholder={
-                      formData.type === 'text' 
-                        ? 'Upiši poruku...' 
-                        : formData.type === 'song'
-                        ? 'https://open.spotify.com/track/... ili https://youtube.com/watch?v=...'
-                        : 'https://...'
-                    } 
-                    required 
-                  />
+                  {formData.type !== 'image' && (
+                    <textarea 
+                      value={formData.content} 
+                      onChange={(e) => setFormData({...formData, content: e.target.value})} 
+                      className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827] min-h-[100px]" 
+                      placeholder={
+                        formData.type === 'text' 
+                          ? 'Upiši poruku...' 
+                          : 'https://open.spotify.com/track/... ili https://youtube.com/watch?v=...'
+                      } 
+                      required 
+                    />
+                  )}
                   {formData.type === 'song' && (
                     <p className="text-xs text-gray-600 mt-2">Primjeri: Spotify track URL ili YouTube video link</p>
                   )}
@@ -228,7 +329,9 @@ function AdminDashboard() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <button type="submit" className="flex-1 py-3 bg-[#111827] text-white border-2 border-black font-semibold">{editingPresent ? 'Spremi' : 'Dodaj'}</button>
+                  <button type="submit" disabled={uploading} className="flex-1 py-3 bg-[#111827] text-white border-2 border-black font-semibold disabled:opacity-60">
+                    {uploading ? 'Učitavanje slike...' : editingPresent ? 'Spremi' : 'Dodaj'}
+                  </button>
                   <button type="button" onClick={resetForm} className="flex-1 py-3 border-2 border-black bg-[#f6f4ee] text-[#111827]">Odustani</button>
                 </div>
               </form>
