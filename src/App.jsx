@@ -39,11 +39,11 @@ function App() {
   if (loading) {
     return (
       <>
-        <div className="min-h-screen flex items-center justify-center p-8 bg-[#f5f4dc]">
-          <div className="w-full max-w-md relative">
-            <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-8 text-center" style={{ boxShadow: '16px 16px 0 0 #000' }}>
-              <h2 className="text-2xl font-bold text-[#111827] mb-2">Učitavanje</h2>
-              <p className="text-sm text-gray-700">Molimo pričekajte...</p>
+        <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+          <div className="w-full max-w-md relative pb-4 pr-4">
+            <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 text-center" style={{ boxShadow: '12px 12px 0 0 #000' }}>
+              <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-2">Učitavanje</h2>
+              <p className="text-xs sm:text-sm text-gray-700">Molimo pričekajte...</p>
               <div className="mt-4 flex items-center justify-center gap-2">
                 <span className="inline-block w-3 h-3 bg-primary rounded-sm animate-pulse" />
                 <span style={{ animationDelay: '0.12s' }} className="inline-block w-3 h-3 bg-primary rounded-sm animate-pulse" />

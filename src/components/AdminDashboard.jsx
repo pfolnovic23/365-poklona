@@ -250,7 +250,7 @@ function AdminDashboard() {
 
   return (
     <div className="min-h-screen flex items-start justify-center p-4 sm:p-6 bg-[#f5f4dc]">
-      <div className="w-full max-w-4xl relative mt-4 sm:mt-6 mx-auto">
+      <div className="w-full max-w-4xl relative mt-4 sm:mt-6 pb-4 pr-4">
         {/* square offset shadow - disabled on small screens to avoid overflow */}
         <div className="absolute inset-0 md:translate-x-4 md:translate-y-4 bg-black" aria-hidden />
 
