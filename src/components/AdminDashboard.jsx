@@ -3,6 +3,7 @@ import { collection, getDocs, addDoc, updateDoc, deleteDoc, doc } from 'firebase
 import { db, auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { Settings, Plus, Edit, Trash2, LogOut } from 'lucide-react';
+import { generateAllPresents, downloadPresentsAsCSV } from '../lib/generatePresents';
 
 // Cloudinary upload function
 const uploadToCloudinary = async (file) => {
@@ -34,6 +35,7 @@ function AdminDashboard() {
   const [minimized, setMinimized] = useState(false);
   const [editingPresent, setEditingPresent] = useState(null);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     day: '',
@@ -133,7 +135,6 @@ function AdminDashboard() {
     }
   };
 
-  // Allow admin to 'pack' a present again (mark as not opened and clear openedAt)
   const packPresent = async (id) => {
     if (!window.confirm('Želiš li zaista vratiti ovaj poklon u stanje "spakirano"?')) return;
     try {
@@ -141,6 +142,60 @@ function AdminDashboard() {
       loadPresents();
     } catch (error) {
       console.error('Error re-packing present:', error);
+    }
+  };
+
+  const handleGenerateAllPresents = async () => {
+    const confirmed = window.confirm(
+      '⚠️ Ovo će generisati svih 365 poklona počevši od 3.11.2025.\n\nSigurno želiš nastaviti?'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      const generatedPresents = generateAllPresents();
+
+      let added = 0;
+      for (const present of generatedPresents) {
+        await addDoc(collection(db, 'presents'), present);
+        added++;
+      }
+
+      alert(`✅ Svih ${added} poklona je uspješno dodano!`);
+      loadPresents();
+    } catch (error) {
+      console.error('Error generating presents:', error);
+      alert('❌ Greška pri generisanju poklona');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAllPresents = async () => {
+    const confirmed = window.confirm(
+      '⚠️ PAŽNJA! Ovo će obrisati SVE poklone iz baze!\n\nOva akcija se ne može vratiti!\n\nSigurno želiš nastaviti?'
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setLoading(true);
+      const querySnapshot = await getDocs(collection(db, 'presents'));
+      let deleted = 0;
+
+      for (const document of querySnapshot.docs) {
+        await deleteDoc(doc(db, 'presents', document.id));
+        deleted++;
+      }
+
+      alert(`✅ Obrisano ${deleted} poklona`);
+      loadPresents();
+    } catch (error) {
+      console.error('Error deleting presents:', error);
+      alert('❌ Greška pri brisanju poklona');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -217,6 +272,35 @@ function AdminDashboard() {
               </button>
             </div>
           </header>
+
+          {/* BULK ACTIONS SECTION */}
+          <div className="mb-6 p-4 bg-[#f6f4ee] border-2 border-dashed border-[#111827]">
+            <h3 className="text-sm font-bold text-[#111827] mb-3">🔧 Bulk Akcije:</h3>
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={handleGenerateAllPresents}
+                disabled={loading}
+                className="py-2 px-3 text-xs sm:text-sm border-2 border-green-600 bg-green-100 text-green-800 hover:bg-green-200 transition-colors disabled:opacity-50 font-semibold"
+              >
+                ✨ Generiši 365 Poklona
+              </button>
+              <button
+                onClick={() => downloadPresentsAsCSV(presents)}
+                disabled={loading || presents.length === 0}
+                className="py-2 px-3 text-xs sm:text-sm border-2 border-blue-600 bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors disabled:opacity-50 font-semibold"
+              >
+                📥 Preuzmi Backup (CSV)
+              </button>
+              <button
+                onClick={handleDeleteAllPresents}
+                disabled={loading}
+                className="py-2 px-3 text-xs sm:text-sm border-2 border-red-600 bg-red-100 text-red-800 hover:bg-red-200 transition-colors disabled:opacity-50 font-semibold"
+              >
+                🗑️ Obriši Sve Poklone
+              </button>
+            </div>
+            {loading && <p className="text-xs text-[#111827] mt-2">⏳ Obrada u tijeku...</p>}
+          </div>
 
           {showForm && (
             <div className="mb-6 relative">
