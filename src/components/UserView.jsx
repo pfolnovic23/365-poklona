@@ -136,7 +136,7 @@ function UserView() {
                     <img 
                       src={selectedPresent.content} 
                       alt="Present" 
-                      className="w-full border-2 border-black"
+                      className="w-full"
                       onLoad={() => setImageLoading(false)}
                       onLoadStart={() => setImageLoading(true)}
                     />
