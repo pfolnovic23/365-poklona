@@ -201,8 +201,25 @@ function AdminDashboard() {
                 )}
 
                 <div className="flex flex-col">
-                  <label className="text-sm text-[#111827] font-medium">{formData.type === 'text' ? 'Tekst' : 'URL'}</label>
-                  <textarea value={formData.content} onChange={(e) => setFormData({...formData, content: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827] min-h-[100px]" placeholder={formData.type === 'text' ? 'Upiši poruku...' : 'https://...'} required />
+                  <label className="text-sm text-[#111827] font-medium">
+                    {formData.type === 'text' ? 'Tekst' : formData.type === 'song' ? 'Spotify ili YouTube URL' : 'Slika URL'}
+                  </label>
+                  <textarea 
+                    value={formData.content} 
+                    onChange={(e) => setFormData({...formData, content: e.target.value})} 
+                    className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827] min-h-[100px]" 
+                    placeholder={
+                      formData.type === 'text' 
+                        ? 'Upiši poruku...' 
+                        : formData.type === 'song'
+                        ? 'https://open.spotify.com/track/... ili https://youtube.com/watch?v=...'
+                        : 'https://...'
+                    } 
+                    required 
+                  />
+                  {formData.type === 'song' && (
+                    <p className="text-xs text-gray-600 mt-2">Primjeri: Spotify track URL ili YouTube video link</p>
+                  )}
                 </div>
 
                 <div className="flex flex-col">

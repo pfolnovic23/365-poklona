@@ -32,7 +32,7 @@ function Login() {
             <Gift size={48} className="text-primary mx-auto" />
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-[#111827] mb-2">Pavel Voli Taru</h1>
-          <p className="text-xs sm:text-sm text-gray-700 mb-6">Prijavi se da otvoriš svoje poklone</p>
+          <p className="text-xs sm:text-sm text-gray-700 mb-6">Prijavi se da otvoriš svoj(e) poklon(e)</p>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
             <input

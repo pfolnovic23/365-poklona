@@ -119,10 +119,50 @@ function UserView() {
 
                 {selectedPresent.type === 'song' && (
                   <div>
-                    <p className="text-sm sm:text-base text-[#111827] font-semibold mb-2">{selectedPresent.title}</p>
-                    <audio controls className="w-full">
-                      <source src={selectedPresent.content} type="audio/mpeg" />
-                    </audio>
+                    <p className="text-sm sm:text-base text-[#111827] font-semibold mb-4">{selectedPresent.title}</p>
+                    {(() => {
+                      // Spotify embed - no border container
+                      if (selectedPresent.content.includes('spotify.com')) {
+                        const spotifyId = selectedPresent.content.split('/track/')[1]?.split('?')[0];
+                        if (spotifyId) {
+                          return (
+                            <iframe
+                              src={`https://open.spotify.com/embed/track/${spotifyId}`}
+                              width="100%"
+                              height="352"
+                              frameBorder="0"
+                              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                              style={{ border: 'none', display: 'block' }}
+                            />
+                          );
+                        }
+                      }
+                      // YouTube embed - with black border
+                      if (selectedPresent.content.includes('youtube.com') || selectedPresent.content.includes('youtu.be')) {
+                        let videoId = '';
+                        if (selectedPresent.content.includes('youtube.com/watch?v=')) {
+                          videoId = selectedPresent.content.split('v=')[1]?.split('&')[0];
+                        } else if (selectedPresent.content.includes('youtu.be/')) {
+                          videoId = selectedPresent.content.split('youtu.be/')[1];
+                        }
+                        if (videoId) {
+                          return (
+                            <div className="border-4 border-black p-0 overflow-hidden">
+                              <iframe
+                                width="100%"
+                                height="315"
+                                src={`https://www.youtube.com/embed/${videoId}`}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                                style={{ border: 'none', display: 'block' }}
+                              />
+                            </div>
+                          );
+                        }
+                      }
+                      return <p className="text-sm text-red-600 p-4">Nevažeći Spotify ili YouTube URL</p>;
+                    })()}
                   </div>
                 )}
                 <div className="mt-6 flex justify-end gap-2">
