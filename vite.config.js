@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/365-poklona/',
+  base: '/',  // Changed from '/365-poklona/' for custom domain (pavelvolitaru.com)
 });
