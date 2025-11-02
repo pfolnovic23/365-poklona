@@ -13,6 +13,16 @@ function UserView() {
 
   useEffect(() => {
     loadPresents();
+    
+    // Reset zoom and scroll to top when entering UserView
+    window.scrollTo(0, 0);
+    document.documentElement.style.zoom = '100%';
+    
+    // For iOS Safari
+    document.body.style.zoom = '100%';
+    
+    // Remove no-scroll restriction when on UserView page
+    document.body.classList.remove('no-scroll');
   }, []);
 
   // Reset image loading when present changes

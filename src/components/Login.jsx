@@ -20,7 +20,13 @@ function Login() {
       });
     }, 2000);
 
-    return () => clearInterval(interval);
+    // Add no-scroll class to body when on login page
+    document.body.classList.add('no-scroll');
+
+    return () => {
+      clearInterval(interval);
+      document.body.classList.remove('no-scroll');
+    };
   }, []);
 
   const handleLogin = async (e) => {
