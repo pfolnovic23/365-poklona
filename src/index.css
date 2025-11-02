@@ -14,13 +14,13 @@
   html, body, #root { height: 100%; }
   body {
     font-family: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
-    background: linear-gradient(135deg, var(--primary-1) 0%, var(--primary-2) 100%);
+    background: #f5f4dc;
     color: #f8fafc;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* subtle topography-like pattern using radial gradients */
+  /* subtle topography-like pattern using radial gradients - hidden for cream theme */
   body::before {
     content: '';
     position: fixed;
@@ -28,7 +28,7 @@
     background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
     background-size: 20px 20px;
     pointer-events: none;
-    opacity: 0.6;
+    opacity: 0;
     mix-blend-mode: overlay;
   }
   :root {
