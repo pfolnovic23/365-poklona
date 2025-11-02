@@ -65,11 +65,11 @@ function UserView() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-8 bg-[#f5f4dc]">
-        <div className="w-full max-w-md relative">
-          <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-8 text-center" style={{ boxShadow: '16px 16px 0 0 #000' }}>
-            <h2 className="text-2xl font-bold text-[#111827] mb-2">Učitavanje</h2>
-            <p className="text-sm text-gray-700">Molimo pričekajte...</p>
+      <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+        <div className="w-full max-w-md relative mx-auto">
+          <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 text-center" style={{ boxShadow: '12px 12px 0 0 #000' }}>
+            <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-2">Učitavanje</h2>
+            <p className="text-xs sm:text-sm text-gray-700">Molimo pričekajte...</p>
           </div>
         </div>
       </div>
@@ -77,8 +77,8 @@ function UserView() {
   }
 
   return (
-    <div className="min-h-screen flex items-start justify-center p-8 bg-[#f5f4dc]">
-      <div className="w-full max-w-6xl relative mt-6">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+      <div className="w-full max-w-6xl relative">
         {/* square offset shadow */}
         <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
 
@@ -100,17 +100,17 @@ function UserView() {
           </div>
 
           {selectedPresent && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50" onClick={() => setSelectedPresent(null)}>
-              <div className="bg-[#fffdfd]/95 border-4 border-black p-8 max-w-2xl w-full mx-4 relative" onClick={(e) => e.stopPropagation()}>
-                <button className="absolute top-4 right-4 text-[#111827] text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
-                <h2 className="text-2xl font-bold text-[#111827] mb-2">Dan {selectedPresent.day}</h2>
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPresent(null)}>
+              <div className="bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 max-w-2xl w-full relative" onClick={(e) => e.stopPropagation()}>
+                <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-[#111827] text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
+                <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-2">Dan {selectedPresent.day}</h2>
 
                 {selectedPresent.opened && selectedPresent.openedAt && (
-                  <p className="text-sm text-gray-600 mb-3">Otvoreno: {formatDateTime(selectedPresent.openedAt)}</p>
+                  <p className="text-xs sm:text-sm text-gray-600 mb-3">Otvoreno: {formatDateTime(selectedPresent.openedAt)}</p>
                 )}
 
                 {selectedPresent.type === 'text' && (
-                  <p className="text-[#111827] leading-relaxed">{selectedPresent.content}</p>
+                  <p className="text-xs sm:text-base text-[#111827] leading-relaxed">{selectedPresent.content}</p>
                 )}
 
                 {selectedPresent.type === 'image' && (
@@ -119,14 +119,14 @@ function UserView() {
 
                 {selectedPresent.type === 'song' && (
                   <div>
-                    <p className="text-[#111827] font-semibold mb-2">{selectedPresent.title}</p>
+                    <p className="text-sm sm:text-base text-[#111827] font-semibold mb-2">{selectedPresent.title}</p>
                     <audio controls className="w-full">
                       <source src={selectedPresent.content} type="audio/mpeg" />
                     </audio>
                   </div>
                 )}
-                <div className="mt-6 flex justify-end">
-                  <button onClick={() => setSelectedPresent(null)} className="px-4 py-2 border-2 border-black bg-[#f6f4ee] text-[#111827]">Zatvori</button>
+                <div className="mt-6 flex justify-end gap-2">
+                  <button onClick={() => setSelectedPresent(null)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border-2 border-black bg-[#f6f4ee] text-[#111827]">Zatvori</button>
                 </div>
               </div>
             </div>
