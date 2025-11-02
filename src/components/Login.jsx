@@ -43,7 +43,7 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+    <div className="h-screen sm:min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
       {/* Single centered square card only (no top banner) */}
       <div className="w-full max-w-sm sm:max-w-md relative mx-auto pb-4 pr-4">
         {/* Card with centered shadow effect */}
