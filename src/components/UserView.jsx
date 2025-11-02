@@ -32,6 +32,19 @@ function UserView() {
     }
   }, [selectedPresent?.id]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedPresent) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedPresent]);
+
   const loadPresents = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'presents'));
