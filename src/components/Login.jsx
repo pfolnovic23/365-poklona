@@ -43,9 +43,9 @@ function Login() {
   };
 
   return (
-    <div className="h-screen sm:min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+    <div className="fixed inset-0 sm:relative sm:min-h-screen w-full flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
       {/* Single centered square card only (no top banner) */}
-      <div className="w-full max-w-sm sm:max-w-md relative mx-auto pb-4 pr-4">
+      <div className="w-full max-w-sm sm:max-w-md relative pb-4 pr-4">
         {/* Card with centered shadow effect */}
         <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 text-center" style={{ boxShadow: '12px 12px 0 0 #000' }}>
           <div className="mb-6">
