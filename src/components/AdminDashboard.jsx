@@ -272,31 +272,31 @@ function AdminDashboard() {
 
           {/* BULK ACTIONS SECTION */}
           <div className="mb-6 p-4 bg-[#f6f4ee] border-2 border-dashed border-[#111827]">
-            <h3 className="text-sm font-bold text-[#111827] mb-3">🔧 Bulk Akcije:</h3>
+            <h3 className="text-sm font-bold text-[#111827] mb-3">Bulk Akcije:</h3>
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={handleGenerateAllPresents}
                 disabled={loading}
                 className="py-2 px-3 text-xs sm:text-sm border-2 border-green-600 bg-green-100 text-green-800 hover:bg-green-200 transition-colors disabled:opacity-50 font-semibold"
               >
-                ✨ Generiši 365 Poklona
+                Generiraj 365 Poklona
               </button>
               <button
                 onClick={() => downloadPresentsAsCSV(presents)}
                 disabled={loading || presents.length === 0}
                 className="py-2 px-3 text-xs sm:text-sm border-2 border-blue-600 bg-blue-100 text-blue-800 hover:bg-blue-200 transition-colors disabled:opacity-50 font-semibold"
               >
-                📥 Preuzmi Backup (CSV)
+                Preuzmi Backup (CSV)
               </button>
               <button
                 onClick={handleDeleteAllPresents}
                 disabled={loading}
                 className="py-2 px-3 text-xs sm:text-sm border-2 border-red-600 bg-red-100 text-red-800 hover:bg-red-200 transition-colors disabled:opacity-50 font-semibold"
               >
-                🗑️ Obriši Sve Poklone
+                Obriši Sve Poklone
               </button>
             </div>
-            {loading && <p className="text-xs text-[#111827] mt-2">⏳ Obrada u tijeku...</p>}
+            {loading && <p className="text-xs text-[#111827] mt-2">Obrada u tijeku...</p>}
           </div>
 
           {showForm && (
@@ -375,10 +375,18 @@ function AdminDashboard() {
                   </div>
                 )}
 
-                {formData.type === 'song' && (
+                {(formData.type === 'image' || formData.type === 'song') && (
                   <div className="flex flex-col">
-                    <label className="text-sm text-[#111827] font-medium">Naslov</label>
-                    <input type="text" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" placeholder="Naziv pjesme" />
+                    <label className="text-sm text-[#111827] font-medium">
+                      {formData.type === 'image' ? 'Poruka uz sliku (opcionalno)' : 'Naslov'}
+                    </label>
+                    <input 
+                      type="text" 
+                      value={formData.title} 
+                      onChange={(e) => setFormData({...formData, title: e.target.value})} 
+                      className="mt-1 p-3 border-2 border-black bg-[#f6f4ee] text-[#111827]" 
+                      placeholder={formData.type === 'image' ? 'Upiši poruku...' : 'Naziv pjesme'} 
+                    />
                   </div>
                 )}
 

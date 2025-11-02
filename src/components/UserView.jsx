@@ -115,7 +115,7 @@ function UserView() {
       <div className="w-full max-w-6xl relative">
         <div className="relative z-10 bg-[#fffdfd]/95 border-4 border-black p-6">
           <header className="flex items-center justify-between mb-6">
-            <h1 className="text-3xl font-extrabold text-[#111827]">Tvoji Pokloni</h1>
+            <h1 className="text-3xl font-extrabold text-[#111827]">For Ma Waf</h1>
             <button onClick={handleLogout} className="py-2 px-4 border-2 border-black bg-[#111827] text-white">Odjavi se</button>
           </header>
 
@@ -145,24 +145,29 @@ function UserView() {
                 )}
 
                 {selectedPresent.type === 'image' && (
-                  <div className="relative mt-4 min-h-48 bg-gradient-to-br from-[#f5f4dc] to-[#f6f4ee] flex items-center justify-center">
-                    {imageLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="flex flex-col items-center gap-3">
-                          <div className="relative w-12 h-12">
-                            <div className="absolute inset-0 border-4 border-transparent border-t-primary border-r-primary rounded-full animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
-                          </div>
-                          <p className="text-xs text-[#111827] font-medium">Učitavanje slike...</p>
-                        </div>
-                      </div>
+                  <div>
+                    {selectedPresent.title && (
+                      <p className="text-xs sm:text-base text-[#111827] leading-relaxed mb-4">{selectedPresent.title}</p>
                     )}
-                    <img 
-                      src={selectedPresent.content} 
-                      alt="Present" 
-                      className={`w-full transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
-                      onLoad={() => setImageLoading(false)}
-                      onError={() => setImageLoading(false)}
-                    />
+                    <div className="relative mt-4 min-h-48 bg-gradient-to-br from-[#f5f4dc] to-[#f6f4ee] flex items-center justify-center">
+                      {imageLoading && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="flex flex-col items-center gap-3">
+                            <div className="relative w-12 h-12">
+                              <div className="absolute inset-0 border-4 border-transparent border-t-primary border-r-primary rounded-full animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                            </div>
+                            <p className="text-xs text-[#111827] font-medium">Učitavanje slike...</p>
+                          </div>
+                        </div>
+                      )}
+                      <img 
+                        src={selectedPresent.content} 
+                        alt="Present" 
+                        className={`w-full transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
+                        onLoad={() => setImageLoading(false)}
+                        onError={() => setImageLoading(false)}
+                      />
+                    </div>
                   </div>
                 )}
 
