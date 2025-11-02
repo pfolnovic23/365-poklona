@@ -9,11 +9,18 @@ function UserView() {
   const [presents, setPresents] = useState([]);
   const [selectedPresent, setSelectedPresent] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [imageLoading, setImageLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
 
   useEffect(() => {
     loadPresents();
   }, []);
+
+  // Reset image loading when present changes
+  useEffect(() => {
+    if (selectedPresent?.type === 'image') {
+      setImageLoading(true);
+    }
+  }, [selectedPresent?.id]);
 
   const loadPresents = async () => {
     try {
@@ -42,11 +49,18 @@ function UserView() {
           openedAt: new Date().toISOString()
         });
         
-        // Trigger confetti celebration
+        // Trigger single smooth confetti celebration
+        const colors = ['#667eea', '#f5f4dc', '#111827', '#fffdfd', '#ff6b6b', '#4ecdc4', '#ffd93d', '#a8dadc'];
+        
         confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { y: 0.6 }
+          particleCount: 200,
+          spread: 360,
+          startVelocity: 50,
+          gravity: 0.4,
+          ticks: 300,
+          scalar: 1.2,
+          colors: colors,
+          origin: { y: 0.5 }
         });
         
         loadPresents();
@@ -87,7 +101,7 @@ function UserView() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc]">
+    <div className="min-h-screen flex items-center justify-center p-4 sm:p-6 md:p-8 bg-[#f5f4dc] overflow-x-hidden">
       <div className="w-full max-w-6xl relative">
         {/* square offset shadow */}
         <div className="absolute inset-0 translate-x-4 translate-y-4 bg-black" aria-hidden />
@@ -110,9 +124,9 @@ function UserView() {
           </div>
 
           {selectedPresent && (
-            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setSelectedPresent(null)}>
-              <div className="bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 max-w-2xl w-full relative" onClick={(e) => e.stopPropagation()}>
-                <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-[#111827] text-xl" onClick={() => setSelectedPresent(null)}>✕</button>
+            <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4 backdrop-blur-sm transition-all duration-200 animate-fadeIn" onClick={() => setSelectedPresent(null)}>
+              <div className="bg-[#fffdfd]/95 border-4 border-black p-6 sm:p-8 max-w-2xl w-full relative shadow-lg transform transition-all duration-300 animate-slideUp" onClick={(e) => e.stopPropagation()}>
+                <button className="absolute top-3 sm:top-4 right-3 sm:right-4 text-[#111827] text-xl hover:scale-110 transition-transform" onClick={() => setSelectedPresent(null)}>✕</button>
                 <h2 className="text-xl sm:text-2xl font-bold text-[#111827] mb-2">Dan {selectedPresent.day}</h2>
 
                 {selectedPresent.opened && selectedPresent.openedAt && (
@@ -124,21 +138,23 @@ function UserView() {
                 )}
 
                 {selectedPresent.type === 'image' && (
-                  <div className="relative mt-4">
+                  <div className="relative mt-4 min-h-48 bg-gradient-to-br from-[#f5f4dc] to-[#f6f4ee] flex items-center justify-center">
                     {imageLoading && (
-                      <div className="absolute inset-0 flex items-center justify-center bg-[#f5f4dc]/80 border-2 border-black z-10">
-                        <div className="flex flex-col items-center gap-2">
-                          <div className="w-8 h-8 border-3 border-black border-t-primary rounded-full animate-spin" />
-                          <p className="text-xs text-[#111827]">Učitavanje...</p>
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex flex-col items-center gap-3">
+                          <div className="relative w-12 h-12">
+                            <div className="absolute inset-0 border-4 border-transparent border-t-primary border-r-primary rounded-full animate-spin" style={{ animation: 'spin 1s linear infinite' }} />
+                          </div>
+                          <p className="text-xs text-[#111827] font-medium">Učitavanje slike...</p>
                         </div>
                       </div>
                     )}
                     <img 
                       src={selectedPresent.content} 
                       alt="Present" 
-                      className="w-full"
+                      className={`w-full transition-opacity duration-500 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
                       onLoad={() => setImageLoading(false)}
-                      onLoadStart={() => setImageLoading(true)}
+                      onError={() => setImageLoading(false)}
                     />
                   </div>
                 )}
@@ -192,7 +208,7 @@ function UserView() {
                   </div>
                 )}
                 <div className="mt-6 flex justify-end gap-2">
-                  <button onClick={() => setSelectedPresent(null)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border-2 border-black bg-[#f6f4ee] text-[#111827]">Zatvori</button>
+                  <button onClick={() => setSelectedPresent(null)} className="px-3 sm:px-4 py-2 text-xs sm:text-sm border-2 border-black bg-[#f6f4ee] text-[#111827] hover:bg-[#e8e6dc] transition-colors">Zatvori</button>
                 </div>
               </div>
             </div>
