@@ -95,7 +95,7 @@ function UserView() {
 
   const isPresentLocked = (present) => {
     const today = new Date();
-    const unlockDate = new Date(present.unlockDate);
+    const unlockDate = new Date(present.unlockDate + 'T00:00:00');
     return today < unlockDate;
   };
 
